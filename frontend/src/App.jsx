@@ -117,7 +117,7 @@ function App() {
         <div className="flex gap-4 mb-4">
           <input
             type="text"
-            placeholder="Filter by Country..."
+            placeholder="Filter by Country/City..."
             className="px-4 py-2 border rounded-lg text-sm"
             onChange={async (e) => {
               const res = await axios.get(
