@@ -6,18 +6,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// A custom logger to track requests in the console
+// Custom Logger
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} to ${req.url}`);
   next();
 });
 
-// Using an array for "in-memory" storage as allowed by the task
+// In-memory data
 let alerts = [
-  { id: 1, country: 'France', city: 'Paris', visaType: 'Tourist', status: 'Active', createdAt: new Date() }
+  { id: "1", country: 'France', city: 'Paris', visaType: 'Tourist', status: 'Active', createdAt: new Date() }
 ];
 
-// GET with filtering logic
+// GET: Fetch all alerts with filtering
 app.get('/alerts', (req, res) => {
   const { country, status } = req.query;
   let filtered = [...alerts];
@@ -28,11 +28,34 @@ app.get('/alerts', (req, res) => {
   res.json(filtered);
 });
 
-// POST logic 
+// POST: Create a new alert
 app.post('/alerts', (req, res) => {
-  const newAlert = { id: Date.now(), ...req.body, createdAt: new Date() };
+  const newAlert = { id: Date.now().toString(), ...req.body, createdAt: new Date() };
   alerts.push(newAlert);
   res.status(201).json(newAlert);
+});
+
+// --- ADDED THESE ROUTES TO FIX YOUR BUTTONS ---
+
+// PUT: Update status (Cycle logic)
+app.put('/alerts/:id', (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  const index = alerts.findIndex(a => a.id.toString() === id.toString());
+  
+  if (index !== -1) {
+    alerts[index].status = status;
+    res.json(alerts[index]);
+  } else {
+    res.status(404).json({ message: "Alert not found" });
+  }
+});
+
+// DELETE: Remove an alert
+app.delete('/alerts/:id', (req, res) => {
+  const { id } = req.params;
+  alerts = alerts.filter(a => a.id.toString() !== id.toString());
+  res.status(204).send();
 });
 
 // Centralized error handling 
@@ -42,4 +65,4 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Internal tool running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
