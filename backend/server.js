@@ -30,6 +30,18 @@ app.get('/alerts', (req, res) => {
 
 // POST: Create a new alert
 app.post('/alerts', (req, res) => {
+  const { country, city, visaType } = req.body;
+
+  // Human Touch: Basic Validation to prevent "messy" data
+  if (!country || !city) {
+    return res.status(400).json({ error: "Location fields (Country/City) are mandatory." });
+  }
+
+  const validTypes = ['Tourist', 'Business', 'Student'];
+  if (!validTypes.includes(visaType)) {
+    return res.status(400).json({ error: "Invalid Visa Category." });
+  }
+
   const newAlert = { id: Date.now().toString(), ...req.body, createdAt: new Date() };
   alerts.push(newAlert);
   res.status(201).json(newAlert);
